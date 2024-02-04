@@ -12,6 +12,16 @@ description: |
   To set up the action, you need to create a YAML file that defines your configurations.
   Refer to the detailed configuration syntax provided in the [yamllint documentation][yamllint_docs].
 
+  ### Configuration URL
+
+  ```yaml
+    steps:
+      - name: Cross Yamllint
+        uses: tmknom/cross-yamllint-action@v0
+        with:
+          configuration-url: https://raw.githubusercontent.com/tmknom/cross-yamllint-action/main/configurations/reusable-workflows.yml
+  ```
+
   ### Configuration Path
 
   ```yaml
@@ -23,18 +33,60 @@ description: |
   ```
 
 inputs:
+  configuration-url:
+    required: false
+    description: The url for the yamllint configurations.
   configuration-path:
     required: false
     description: The path for the yamllint configurations.
+
+outputs:
+  configuration-path:
+    value: ${{ steps.config.outputs.path }}
+    description: The path for the configuration file to passing yamllint.
 
 runs:
   using: composite
 
   steps:
+    - name: Generate unique identifier
+      id: unique
+      run: |
+        echo "::group::Generate unique identifier"
+        set -x
+        current="$(date '+%Y%m%d-%H%M%S')"
+        random="$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9')"
+        identifier="${current}-${GITHUB_JOB}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA}-${random}"
+        echo "identifier=${identifier}" >> "${GITHUB_OUTPUT}"
+        echo "::endgroup::"
+      shell: bash
+
+    # curl options
+    #
+    # --silent: Silent or quiet mode.
+    # --silent: When used with -s, --silent, it makes curl show an error message if it fails.
+    # --location: If the server reports that the requested page has moved to a different location, redo the request on the new place.
+    # --output <file>: Write output to <file> instead of stdout.
+    - name: Download configuration
+      id: download
+      if: ${{ inputs.configuration-url != '' }}
+      env:
+        PREFIX: yamllint
+        IDENTIFIER: ${{ steps.unique.outputs.identifier }}
+        CONFIGURATION_URL: ${{ inputs.configuration-url }}
+      run: |
+        echo "::group::Download configuration"
+        set -x
+        config="${RUNNER_TEMP}/${PREFIX}-${IDENTIFIER}.yml"
+        curl --silent --show-error --location --output "${config}" "${CONFIGURATION_URL}"
+        echo "path=${config}" >> "${GITHUB_OUTPUT}"
+        echo "::endgroup::"
+      shell: bash
+
     - name: Validate configuration
       id: config
       env:
-        CONFIG_PATH: ${{ inputs.configuration-path }}
+        CONFIG_PATH: ${{ steps.download.outputs.path || inputs.configuration-path }}
         DEFAULT_CONFIG_PATH: .yamllint.yml
       run: |
         echo "::group::Validate configuration"
