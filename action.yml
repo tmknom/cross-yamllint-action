@@ -120,6 +120,7 @@ runs:
 
     - name: Run yamllint
       env:
+        CONFIG_PATH: ${{ steps.config.outputs.path }}
         OPTIONS: ${{ steps.prepare.outputs.options }}
       run: |
         echo "::group::Run yamllint"
