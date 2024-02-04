@@ -16,7 +16,7 @@ This action runs [yamllint][yamllint], a tool designed to lint YAML files.
 ## Usage
 
 To set up the action, you need to create a YAML file that defines your configurations.
-Refer to the detailed configuration syntax provided in the [yamllint documentation][yamllint_docs].
+Refer to the detailed configuration syntax for the yamllint in [yamllint/Rules][yamllint_rules].
 
 ### Configuration Path
 
