@@ -18,6 +18,16 @@ This action runs [yamllint][yamllint], a tool designed to lint YAML files.
 To set up the action, you need to create a YAML file that defines your configurations.
 Refer to the detailed configuration syntax provided in the [yamllint documentation][yamllint_docs].
 
+### Configuration URL
+
+```yaml
+  steps:
+    - name: Cross Yamllint
+      uses: tmknom/cross-yamllint-action@v0
+      with:
+        configuration-url: https://raw.githubusercontent.com/tmknom/cross-yamllint-action/main/configurations/reusable-workflows.yml
+```
+
 ### Configuration Path
 
 ```yaml
@@ -33,10 +43,13 @@ Refer to the detailed configuration syntax provided in the [yamllint documentati
 | Name | Description | Default | Required |
 | :--- | :---------- | :------ | :------: |
 | configuration-path | The path for the yamllint configurations. | n/a | no |
+| configuration-url | The url for the yamllint configurations. | n/a | no |
 
 ## Outputs
 
-N/A
+| Name | Description |
+| :--- | :---------- |
+| configuration-path | The path for the configuration file to passing yamllint. |
 
 <!-- actdocs end -->
 
