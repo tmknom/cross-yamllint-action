@@ -10,7 +10,7 @@ description: |
   ## Usage
 
   To set up the action, you need to create a YAML file that defines your configurations.
-  Refer to the detailed configuration syntax for the yamllint in [yamllint/Rules][yamllint_rules].
+  Refer to the detailed configuration syntax provided in the [yamllint documentation][yamllint_docs].
 
   ### Configuration Path
 
