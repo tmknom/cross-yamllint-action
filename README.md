@@ -1,26 +1,38 @@
-# template-composite-action
+# cross-yamllint-action
 
-Template repository for Composite Action.
+Run [yamllint][yamllint] with configuration shared across repositories.
 
 <!-- actdocs start -->
 
 ## Description
 
-Template repository for creating Composite Action with GitHub Actions.
+This action runs [yamllint][yamllint], a tool designed to lint YAML files.
+
+> [!NOTE]
+> yamllint checks not only for syntax validity,
+> but also detects potential bugs like key repetition,
+> and style problems such as lines length, trailing spaces, indentation, etc.
 
 ## Usage
 
-Write usage for your Composite Action.
+To set up the action, you need to create a YAML file that defines your configurations.
+Refer to the detailed configuration syntax provided in the [yamllint documentation][yamllint_docs].
+
+### Configuration Path
 
 ```yaml
   steps:
-    - name: Template
-      uses: tmknom/template-composite-action@v0
+    - name: Cross Yamllint
+      uses: tmknom/cross-yamllint-action@v0
+      with:
+        configuration-path: .yamllint.yml
 ```
 
 ## Inputs
 
-N/A
+| Name | Description | Default | Required |
+| :--- | :---------- | :------ | :------: |
+| configuration-path | The path for the yamllint configurations. | n/a | no |
 
 ## Outputs
 
@@ -44,4 +56,6 @@ See [GitHub Releases][releases].
 
 Apache 2 Licensed. See [LICENSE](LICENSE) for full details.
 
-[releases]: https://github.com/tmknom/template-composite-action/releases
+[yamllint]: https://github.com/adrienverge/yamllint
+[yamllint_docs]: https://yamllint.readthedocs.io/en/stable/rules.html
+[releases]: https://github.com/tmknom/cross-yamllint-action/releases
