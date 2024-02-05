@@ -25,7 +25,7 @@ Refer to the detailed configuration syntax provided in the [yamllint documentati
     - name: Cross Yamllint
       uses: tmknom/cross-yamllint-action@v0
       with:
-        configuration-url: https://raw.githubusercontent.com/tmknom/cross-yamllint-action/main/configurations/reusable-workflows.yml
+        configuration-url: https://raw.githubusercontent.com/tmknom/configurations/main/yamllint/github-actions.yml
 ```
 
 ### Configuration Path
