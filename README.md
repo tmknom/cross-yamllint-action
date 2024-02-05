@@ -61,6 +61,11 @@ N/A
 
 N/A
 
+## Related projects
+
+- [lint-workflows](https://github.com/tmknom/lint-workflows): Collection of lint workflows.
+- [configurations](https://github.com/tmknom/configurations): Collection of configurations.
+
 ## Release notes
 
 See [GitHub Releases][releases].
