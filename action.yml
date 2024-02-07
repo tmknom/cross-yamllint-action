@@ -49,17 +49,9 @@ runs:
   using: composite
 
   steps:
-    - name: Generate unique identifier
-      id: unique
-      run: |
-        echo "::group::Generate unique identifier"
-        set -x
-        current="$(date '+%Y%m%d-%H%M%S')"
-        random="$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9')"
-        identifier="${current}-${GITHUB_JOB}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA}-${random}"
-        echo "identifier=${identifier}" >> "${GITHUB_OUTPUT}"
-        echo "::endgroup::"
-      shell: bash
+    - name: Traceable Identifier
+      id: traceable
+      uses: tmknom/traceable-identifier-action@6555160c543eb771a876fb4ceaecd43ec79df7b6 # v0.1.0
 
     # curl options
     #
@@ -72,7 +64,7 @@ runs:
       if: ${{ inputs.configuration-url != '' }}
       env:
         PREFIX: yamllint
-        IDENTIFIER: ${{ steps.unique.outputs.identifier }}
+        IDENTIFIER: ${{ steps.traceable.outputs.identifier }}
         CONFIGURATION_URL: ${{ inputs.configuration-url }}
       run: |
         echo "::group::Download configuration"
