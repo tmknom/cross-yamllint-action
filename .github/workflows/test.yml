@@ -59,10 +59,11 @@ jobs:
       - name: Verify
         env:
           CONFIGURATION_PATH: ${{ steps.exercise.outputs.configuration-path }}
+          CONFIGURATION_SHA256: ${{ steps.exercise.outputs.configuration-sha256 }}
         run: |
           set -x
           test "${CONFIGURATION_PATH}" = "${RUNNER_TEMP}/.yamllint.yml"
-          test "$(md5sum "${CONFIGURATION_PATH}" | cut -d' ' -f1)" = "b4def25a7e1074ab34d8c7af1ce158de"
+          test "${CONFIGURATION_SHA256}" = "1c7c8c6449287811c31a38641ec6f3a55735d35ecfa3d1581d9a3900e9526c55"
 
   test-configuration-url:
     name: Test for configuration-url
@@ -88,10 +89,11 @@ jobs:
       - name: Verify
         env:
           CONFIGURATION_PATH: ${{ steps.exercise.outputs.configuration-path }}
+          CONFIGURATION_SHA256: ${{ steps.exercise.outputs.configuration-sha256 }}
         run: |
           set -x
           [[ "${CONFIGURATION_PATH}" =~ "${RUNNER_TEMP}"/yamllint-.*.yml ]]
-          test "$(md5sum "${CONFIGURATION_PATH}" | cut -d' ' -f1)" = "f93aec62a2b45122e799a78a4495b247"
+          test "${CONFIGURATION_SHA256}" = "5c92f9928f6e90a2e2809a7e75cac329283a6de0ee77b737c1cedc526d19c298"
 
   test-omit:
     name: Test for omit
@@ -127,10 +129,11 @@ jobs:
       - name: Verify
         env:
           CONFIGURATION_PATH: ${{ steps.exercise.outputs.configuration-path }}
+          CONFIGURATION_SHA256: ${{ steps.exercise.outputs.configuration-sha256 }}
         run: |
           set -x
           test "${CONFIGURATION_PATH}" = ".yamllint.yml"
-          test "$(md5sum "${CONFIGURATION_PATH}" | cut -d' ' -f1)" = "4af9a8504f1c5fe36f15e17d0b910c4c"
+          test "${CONFIGURATION_SHA256}" = "901d7a5d8191d63e757170eb853a799dbfe651f0da3a2bca658792afbc5e66d7"
 
   test-error:
     name: Test for error
@@ -156,6 +159,8 @@ jobs:
         if: ${{ always() }}
         env:
           OUTCOME: ${{ steps.exercise.outcome }}
+          CONFIGURATION_SHA256: ${{ steps.exercise.outputs.configuration-sha256 }}
         run: |
           set -x
           test "${OUTCOME}" = "failure"
+          test "${CONFIGURATION_SHA256}" = "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"

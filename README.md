@@ -50,6 +50,7 @@ Refer to the detailed configuration syntax provided in the [yamllint documentati
 | Name | Description |
 | :--- | :---------- |
 | configuration-path | The path for the configuration file to passing yamllint. |
+| configuration-sha256 | SHA256 of the configuration file to passing yamllint. |
 
 <!-- actdocs end -->
 
