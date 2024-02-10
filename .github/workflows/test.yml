@@ -1,0 +1,161 @@
+name: Test
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ["action.yml", ".github/workflows/test.yml"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  DEFAULT_CONFIG_PATH: .yamllint.yml
+
+jobs:
+  test-configuration-path:
+    name: Test for configuration-path
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: tmknom/checkout-action@v1
+
+      - name: Setup
+        id: setup
+        run: |
+          set -x
+          rm -f "${DEFAULT_CONFIG_PATH}"
+
+          config="${RUNNER_TEMP}/.yamllint.yml"
+          cat <<EOF >"${config}"
+          extends: default
+          rules:
+            document-start: disable
+            truthy:
+              allowed-values: ["true", "false", "on"]
+            comments:
+              min-spaces-from-content: 1
+            braces:
+              max-spaces-inside: 1
+            line-length:
+              max: 210
+          EOF
+          echo "path=${config}" >> "${GITHUB_OUTPUT}"
+
+      - name: Exercise
+        id: exercise
+        uses: ./
+        with:
+          configuration-path: ${{ steps.setup.outputs.path }}
+
+      - name: Verify
+        env:
+          CONFIGURATION_PATH: ${{ steps.exercise.outputs.configuration-path }}
+        run: |
+          set -x
+          test "${CONFIGURATION_PATH}" = "${RUNNER_TEMP}/.yamllint.yml"
+          test "$(md5sum "${CONFIGURATION_PATH}" | cut -d' ' -f1)" = "b4def25a7e1074ab34d8c7af1ce158de"
+
+  test-configuration-url:
+    name: Test for configuration-url
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: tmknom/checkout-action@v1
+
+      - name: Setup
+        run: |
+          set -x
+          rm -f "${DEFAULT_CONFIG_PATH}"
+
+      - name: Exercise
+        id: exercise
+        uses: ./
+        with:
+          configuration-url: https://raw.githubusercontent.com/tmknom/cross-yamllint-action/6ecc9fb3d745a6fb16a6acebccd4ae0b8c42a45c/.github/fixtures/test.yml
+
+      - name: Verify
+        env:
+          CONFIGURATION_PATH: ${{ steps.exercise.outputs.configuration-path }}
+        run: |
+          set -x
+          [[ "${CONFIGURATION_PATH}" =~ "${RUNNER_TEMP}"/yamllint-.*.yml ]]
+          test "$(md5sum "${CONFIGURATION_PATH}" | cut -d' ' -f1)" = "f93aec62a2b45122e799a78a4495b247"
+
+  test-omit:
+    name: Test for omit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: tmknom/checkout-action@v1
+
+      - name: Setup
+        run: |
+          set -x
+          cat <<EOF >"${DEFAULT_CONFIG_PATH}"
+          extends: default
+          rules:
+            document-start: disable
+            truthy:
+              allowed-values: ["true", "false", "on"]
+            comments:
+              min-spaces-from-content: 1
+            braces:
+              max-spaces-inside: 1
+            line-length:
+              max: 220
+          EOF
+
+      - name: Exercise
+        id: exercise
+        uses: ./
+
+      - name: Verify
+        env:
+          CONFIGURATION_PATH: ${{ steps.exercise.outputs.configuration-path }}
+        run: |
+          set -x
+          test "${CONFIGURATION_PATH}" = ".yamllint.yml"
+          test "$(md5sum "${CONFIGURATION_PATH}" | cut -d' ' -f1)" = "4af9a8504f1c5fe36f15e17d0b910c4c"
+
+  test-error:
+    name: Test for error
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: tmknom/checkout-action@v1
+
+      - name: Setup
+        run: |
+          set -x
+          rm -f "${DEFAULT_CONFIG_PATH}"
+
+      - name: Exercise
+        id: exercise
+        uses: ./
+        continue-on-error: true
+
+      - name: Verify
+        if: ${{ always() }}
+        env:
+          OUTCOME: ${{ steps.exercise.outcome }}
+        run: |
+          set -x
+          test "${OUTCOME}" = "failure"
