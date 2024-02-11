@@ -44,6 +44,9 @@ outputs:
   configuration-path:
     value: ${{ steps.config.outputs.path }}
     description: The path for the configuration file to passing yamllint.
+  configuration-sha256:
+    value: ${{ steps.config.outputs.sha256 }}
+    description: SHA256 of the configuration file to passing yamllint.
 
 runs:
   using: composite
@@ -85,17 +88,21 @@ runs:
         set -x
         if [[ "${CONFIG_PATH}" != "" && -f "${CONFIG_PATH}" ]]; then
           valid="${CONFIG_PATH}"
+          sha256="$(sha256sum "${valid}" | cut -d' ' -f1)"
         elif [[ -f "${DEFAULT_CONFIG_PATH}" ]]; then
           title="configuration file for the yamllint was omitted"
           message="recommend explicitly specifying the configuration file"
           echo "::notice title=${title}::${message}"
           valid="${DEFAULT_CONFIG_PATH}"
+          sha256="$(sha256sum "${valid}" | cut -d' ' -f1)"
         else
           title="not found configuration file for the yamllint"
           message="ensure that you specify valid configuration-path"
           echo "::warning:: ${title}: ${detail}"
+          sha256="$(sha256sum <<<'' | cut -d' ' -f1)"
         fi
         echo "path=${valid}" >> "${GITHUB_OUTPUT}"
+        echo "sha256=${sha256}" >> "${GITHUB_OUTPUT}"
         echo "::endgroup::"
       shell: bash
 
