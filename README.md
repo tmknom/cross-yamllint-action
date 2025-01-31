@@ -71,10 +71,6 @@ N/A
 
 See [GitHub Releases][releases].
 
-## License
-
-Apache 2 Licensed. See [LICENSE](LICENSE) for full details.
-
 [yamllint]: https://github.com/adrienverge/yamllint
 [yamllint_docs]: https://yamllint.readthedocs.io/en/stable/rules.html
 [releases]: https://github.com/tmknom/cross-yamllint-action/releases
