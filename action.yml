@@ -52,10 +52,6 @@ runs:
   using: composite
 
   steps:
-    - name: Traceable Identifier
-      id: traceable
-      uses: tmknom/traceable-identifier-action@6555160c543eb771a876fb4ceaecd43ec79df7b6 # v0.1.0
-
     # curl options
     #
     # --silent: Silent or quiet mode.
@@ -67,12 +63,12 @@ runs:
       if: ${{ inputs.configuration-url != '' }}
       env:
         PREFIX: yamllint
-        IDENTIFIER: ${{ steps.traceable.outputs.identifier }}
         CONFIGURATION_URL: ${{ inputs.configuration-url }}
       run: |
         echo "::group::Download configuration"
         set -x
-        config="${RUNNER_TEMP}/${PREFIX}-${IDENTIFIER}.yml"
+        identifier="$(printf '%s' "${CONFIGURATION_URL}" | sha256sum | cut -d' ' -f1)"
+        config="${RUNNER_TEMP}/${PREFIX}-${identifier}.yml"
         curl --silent --show-error --location --output "${config}" "${CONFIGURATION_URL}"
         echo "path=${config}" >> "${GITHUB_OUTPUT}"
         echo "::endgroup::"
